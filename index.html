@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css" />
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>todos</h1>
+    <div class="todo__main">
+        <div class="todo__add">
+            <div class="todo__select-all hidden" id="select__all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                    <path
+                        d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+                </svg>
+            </div>
+            <input class="input__todo" type="text" placeholder="What needs to be done?" autofocus>
+        </div>
+        <div class="todo__list">
+            <!-- <div class="todo__item" id="item__0">
+                <input class="todo__checkbox" type="checkbox" id="checkbox__0" />
+                <div class=" todo__content">1st todo
+                </div>
+                <button class="todo__delete" id="delete__0">X</button>
+            </div> -->
+        </div>
+        <div class="todo__nav hidden" id="nav__bar">
+            <div class="todo__nav todo__item_left">1 items left</div>
+            <button class="todo__nav todo__all">All</button>
+            <button class="todo__nav todo__active">Active</button>
+            <button class="todo__nav todo__completed">Completed</button>
+            <button class="todo__nav todo__clear_completed">Clear completed</button>
+        </div>
+        <div class="todo_note">Double-click to edit a todo</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
