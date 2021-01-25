@@ -4,7 +4,7 @@ const elemInputTodo = document.querySelector('.input__todo');
 const elemTodoList = document.querySelector('.todo__list');
 
 let todo_items = [],
-	checked_items = [];
+	done_items = [], undone_items = [];
 
 // *Add new item to todo list*
 elemInputTodo.addEventListener('keyup', function(event) {
@@ -15,6 +15,7 @@ elemInputTodo.addEventListener('keyup', function(event) {
 
 		// Add to array
 		todo_items.push(`item__${todo_items.length + 1}`);
+		undone_items.push(`item__${undone_items.length + 1}`);
 
 		// Add new element to <div class="todo__list">
 		const html = `
@@ -31,6 +32,9 @@ elemInputTodo.addEventListener('keyup', function(event) {
 		// Show select all button
 		document.getElementById('select__all').classList.remove('hidden');
 
+		// Update number of items
+		undone_items.length > 1 ? document.getElementById('item__left').textContent = `${undone_items.length} items left`:document.getElementById('item__left').textContent = `${undone_items.length} item left`;
+
 		// *Add event for checkbox*
 		document.getElementById(`checkbox__${todo_items.length}`).onclick = function(e) {
 			// If a row is checked --> Add its id to the list containing all selected ids
@@ -41,20 +45,36 @@ elemInputTodo.addEventListener('keyup', function(event) {
 
 			if (e.target.checked) {
 				// Add id to the list containing all selected ids
-				checked_items.push(item_id);
-				document.getElementById(`content__${id}`).classList.add('content--done');
-				console.log(document.getElementById(`content__${id}`));
-			} else {
-				// If unchecked a row --> Remove it from the list containing all selected ids
-				const index = checked_items.indexOf(item_id);
+				done_items.push(item_id);
+
+				// Remove from array of undone items
+				const index = undone_items.indexOf(item_id);
 				if (index !== -1) {
-					checked_items.splice(index, 1);
+					undone_items.splice(index, 1);
 				}
 
+				document.getElementById(`content__${id}`).classList.add('content--done');
+				console.log(document.getElementById(`content__${id}`));
+
+				// Update number of items
+				undone_items.length > 1 ? document.getElementById('item__left').textContent = `${undone_items.length} items left`:document.getElementById('item__left').textContent = `${undone_items.length} item left`;
+			} else {
+				// If unchecked a row --> Remove it from the list containing all selected ids
+				const index = done_items.indexOf(item_id);
+				if (index !== -1) {
+					done_items.splice(index, 1);
+				}
+				// Add id to the list containing all undone items
+				undone_items.push(item_id);
+
 				document.getElementById(`content__${id}`).classList.remove('content--done');
+				// Update number of items
+				undone_items.length > 1 ? document.getElementById('item__left').textContent = `${undone_items.length} items left`:document.getElementById('item__left').textContent = `${undone_items.length} item left`;
 			}
-			console.log('checked_items');
-			console.log(checked_items);
+			console.log('done_items');
+			console.log(done_items);
+			console.log('undone_items');
+			console.log(undone_items);
 		};
 
 		// *Add event for delete button*
@@ -75,12 +95,12 @@ elemInputTodo.addEventListener('keyup', function(event) {
 
 			// Remove element from array
 			const index1 = todo_items.indexOf(item_id),
-				index2 = checked_items.indexOf(item_id);
+				index2 = done_items.indexOf(item_id);
 			if (index1 !== -1) {
 				todo_items.splice(index1, 1);
 			}
 			if (index2 !== -1) {
-				checked_items.splice(index2, 1);
+				done_items.splice(index2, 1);
 			}
 
 			// If no items left:
@@ -93,8 +113,8 @@ elemInputTodo.addEventListener('keyup', function(event) {
 			}
 			console.log('todo_items');
 			console.log(todo_items);
-			console.log('checked_items');
-			console.log(checked_items);
+			console.log('done_items');
+			console.log(done_items);
 		});
 
 		// Empty input field
@@ -116,13 +136,13 @@ btnSelectAll.addEventListener('click', function(e) {
 			document.getElementById(`checkbox__${id}`).checked = true;
 			document.getElementById(`content__${id}`).classList.add('content--done');
 		});
-		checked_items = todo_items;
+		done_items = todo_items;
 		isSelectedAll = !isSelectedAll;
 
 		console.log('todo_items');
 		console.log(todo_items);
-		console.log('checked_items');
-		console.log(checked_items);
+		console.log('done_items');
+		console.log(done_items);
 	} else {
 		todo_items.forEach(function(item, i) {
 			const id = item.split('__')[1];
@@ -130,11 +150,11 @@ btnSelectAll.addEventListener('click', function(e) {
 			document.getElementById(`checkbox__${id}`).checked = false;
 			document.getElementById(`content__${id}`).classList.remove('content--done');
 		});
-		checked_items = [];
+		done_items = [];
 
 		console.log('todo_items');
 		console.log(todo_items);
-		console.log('checked_items');
-		console.log(checked_items);
+		console.log('done_items');
+		console.log(done_items);
 	}
 });
