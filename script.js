@@ -2,7 +2,9 @@
 
 const btnSlctAll = document.querySelector('.todo__select_all');
 const elmTodoInput = document.querySelector('.todo__input');
-const elmTodoList = document.querySelector('.todo__list');
+const elmTodo_All = document.querySelector('.todo__all');
+const elmTodo_Actv = document.querySelector('.todo__active');
+const elmTodo_Cmpltd = document.querySelector('.todo__completed');
 const elmNavBar = document.getElementById('nav__bar');
 const elmItemLeft = document.getElementById('item__left');
 
@@ -113,7 +115,7 @@ elmTodoInput.addEventListener('keyup', function(event) {
             <div class="todo__content" id="content__${todo_items.length}">${elmTodoInput.value}</div>
             <button class="todo__delete" id="delete__${todo_items.length}">X</button>
         </div>`;
-        elmTodoList.insertAdjacentHTML('beforeend', html);
+        elmTodo_All.insertAdjacentHTML('beforeend', html);
 
         // Add navigation bar
         elmNavBar.classList.remove('hidden');
@@ -133,7 +135,7 @@ elmTodoInput.addEventListener('keyup', function(event) {
 // *Add event for checkbox using Event Delegation*
 // *Add event for delete button using Event Delegation*
 /// Step 1: Add event listener to the parent element of all the child elements we want to add event
-elmTodoList.addEventListener('click', function(e) {
+elmTodo_All.addEventListener('click', function(e) {
     // '.todo__list' is the parent of '.todo__item'
 
     /// Step 2: If the e.target contains '.todo__checkbox' ie. if we click the checkbox
@@ -147,8 +149,8 @@ elmTodoList.addEventListener('click', function(e) {
             const currItem = findItemById(todo_items, id);
             currItem.isDone = true;
 
-            document.getElementById(`content__${id}`).classList.add('done');
-            console.log(document.getElementById(`content__${id}`));
+            const checkedItem = document.getElementById(`content__${id}`);
+            checkedItem.classList.add('done');
 
             // Update number of undone items
             updateNavigation(todo_items);
@@ -164,6 +166,8 @@ elmTodoList.addEventListener('click', function(e) {
             updateNavigation(todo_items);
         }
     }
+
+    // Delete button
     if (e.target.classList.contains('todo__delete')) {
         const id = Number(e.target.id.split('__')[1]),
             item_id = `item__${id}`;
@@ -227,13 +231,14 @@ btnFltr_All.addEventListener('click', function(e) {
 
     btnFltr_All.classList.add('active');
 
-    // Show all items (remove class 'hidden' from all items)
-    document.querySelectorAll('.todo__item').forEach(function(item) {
+    // Remove class 'hidden' from all items
+    console.log('all:', divFltr_All.children);
+    todo_items.forEach(function(item) {
         item.classList.remove('hidden');
     });
 });
 
-// Show undone items
+// Show undone (active) items
 btnFltr_Actv.addEventListener('click', function(e) {
     e.preventDefault();
     // Set button active
@@ -244,7 +249,16 @@ btnFltr_Actv.addEventListener('click', function(e) {
 
     btnFltr_Actv.classList.add('active');
 
-    // Set all DONE items to 'hidden', remove 'hidden' from all UNDONE items
+    // Add class 'hidden' for done items
+    console.log('---todo_items', todo_items);
+    todo_items.forEach(function(item) {
+        console.log('item', item);
+        if (item.isDone === true) {
+            item.classList.add('hidden');
+        } else {
+            item.classList.remove('hidden');
+        }
+    });
 });
 
 // Show done items
@@ -258,12 +272,12 @@ btnFltr_Cmpltd.addEventListener('click', function(e) {
 
     btnFltr_Cmpltd.classList.add('active');
 
-    // Show <div class="todo__list todo__completed"> and hide others
-    /// Remove all first and then add again
-    divFltr_All.classList.remove('hidden');
-    divFltr_Actv.classList.remove('hidden');
-    divFltr_Cmpltd.classList.remove('hidden');
-
-    divFltr_All.classList.add('hidden');
-    divFltr_Actv.classList.add('hidden');
+    // Add class 'hidden' for undone items
+    todo_items.forEach(function(item) {
+        if (item.isDone === false) {
+            item.classList.add('hidden');
+        } else {
+            item.classList.remove('hidden');
+        }
+    });
 });
