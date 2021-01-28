@@ -1,0 +1,33 @@
+{
+    "name": "myjavascriptproject",
+    "version": "1.0.0",
+    "description": "Udemy course for javascript",
+    "main": "index.js",
+    "dependencies": {
+        "es2020": "^1.1.9",
+        "express": "^4.17.1"
+    },
+    "devDependencies": {
+        "@babel/plugin-proposal-optional-chaining": "^7.12.7",
+        "@typescript-eslint/eslint-plugin": "^2.8.0",
+        "@typescript-eslint/parser": "^2.8.0",
+        "eslint": "^6.6.0",
+        "eslint-config-prettier": "^6.7.0",
+        "eslint-plugin-prettier": "^3.1.1",
+        "prettier": "^1.19.1",
+        "typescript": "^3.7.2"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/thipham0502/Udemy-The-Complete-Javascript-Course-2020---From-Zero-to-Expert.git"
+    },
+    "author": "thipham0502@gmail.com",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/thipham0502/Udemy-The-Complete-Javascript-Course-2020---From-Zero-to-Expert/issues"
+    },
+    "homepage": "https://github.com/thipham0502/Udemy-The-Complete-Javascript-Course-2020---From-Zero-to-Expert#readme"
+}
