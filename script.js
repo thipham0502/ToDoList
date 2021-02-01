@@ -1,12 +1,10 @@
 'use strict';
 
 const btnSlctAll = document.querySelector('.todo__select_all');
-const elmTodoInput = document.querySelector('.todo__input');
-const elmTodo_All = document.querySelector('.todo__all');
-const elmTodo_Actv = document.querySelector('.todo__active');
-const elmTodo_Cmpltd = document.querySelector('.todo__completed');
-const elmNavBar = document.getElementById('nav__bar');
-const elmItemLeft = document.getElementById('item__left');
+const inputToDo = document.querySelector('.todo__input');
+const divTodoList = document.querySelector('.todo__list');
+const divNavBar = document.getElementById('nav__bar');
+const divItemLeft = document.getElementById('item__left');
 
 // *Filter buttons*
 const btnFltr_All = document.querySelector('.todo__filter_all');
@@ -15,16 +13,17 @@ const btnFltr_Cmpltd = document.querySelector('.todo__filter_completed');
 const btnClearCmpltd = document.querySelector('.todo__clear_completed');
 
 // *Filter areas*
-const divFltr_All = document.querySelector('.todo__all');
-const divFltr_Actv = document.querySelector('.todo__active');
-const divFltr_Cmpltd = document.querySelector('.todo__completed');
+const divTodo_All = document.querySelector('.todo__all');
+const divTodo_Actv = document.querySelector('.todo__active');
+const divTodo_Cmpltd = document.querySelector('.todo__completed');
 
 const btnTest = document.querySelector('#button__test');
 
 // Class for all todo items
 class ToDo {
-    constructor(id, content, isDone, isDeleted) {
+    constructor(id, itemId, content, isDone, isDeleted) {
         this.id = id;
+        this.itemId = itemId;
         this.content = content;
         this.isDone = isDone;
         this.isDeleted = isDeleted;
@@ -59,36 +58,45 @@ const updateNavigation = function(itemList) {
     if (deleted === itemList.length) {
         // If no items left
         /// Hide navigation bar
-        elmNavBar.classList.add('hidden');
+        divNavBar.classList.add('hidden');
 
         /// Hide button select__all
         btnSlctAll.classList.add('hidden');
     } else {
-        if (undone > 1) elmItemLeft.textContent = `${undone} items left`;
-        else elmItemLeft.textContent = `${undone} item left`;
+        if (undone > 1) divItemLeft.textContent = `${undone} items left`;
+        else divItemLeft.textContent = `${undone} item left`;
     }
 };
 
 // Function to find the item with the given id
-const findItemById = function(itemList, id) {
-    // console.log('itemList', itemList);
+const findItemById = function(itemList, itemId) {
+    console.log('itemList', itemList);
+    console.log('itemId', itemId);
 
     // Loop to find the item with the given id (don't use forEach because it will not BREAK out and always loop for all items)
     for (const item of itemList) {
-        if (item.id === id) {
-            // console.log('found', item);
+        if (item.itemId === itemId) {
+            console.log('found', item);
             return item;
         }
     }
 };
 
+const createToDoItemHTML = function(id, type, content) {
+    return `<div class="todo__item" id="item__${type}-${id}">
+                <input class="todo__checkbox" type="checkbox" id="checkbox__${type}-${id}"/>
+                <div class="todo__content" id="content__${type}-${id}">${content}</div>
+                <button class="todo__delete" id="delete__${type}-${id}">X</button>
+            </div>`;
+};
+
 btnTest.addEventListener('click', function() {
-    const obj = findItemById(todo_items, 2);
+    const obj = findItemById(todo_items, 'item__2');
     console.log('test', obj);
 });
 
 // *Add new item to todo list*
-elmTodoInput.addEventListener('keyup', function(event) {
+inputToDo.addEventListener('keyup', function(event) {
     // Number 13 is the "Enter" key on the keyboard
     if (event.keyCode === 13) {
         // Cancel the default action, if needed
@@ -97,7 +105,8 @@ elmTodoInput.addEventListener('keyup', function(event) {
         // Create new todo instance
         const newToDo = new ToDo(
             todo_items.length + 1,
-            elmTodoInput.value,
+            `item__${todo_items.length + 1}`,
+            inputToDo.value,
             false,
             false
         );
@@ -109,16 +118,23 @@ elmTodoInput.addEventListener('keyup', function(event) {
         //*undone_items.push(`item__${undone_items.length + 1}`);
 
         // Add new element to <div class="todo__list todo__all">
-        const html = `
-        <div class="todo__item" id="item__${todo_items.length}">
-            <input class="todo__checkbox" type="checkbox" id="checkbox__${todo_items.length}"/>
-            <div class="todo__content" id="content__${todo_items.length}">${elmTodoInput.value}</div>
-            <button class="todo__delete" id="delete__${todo_items.length}">X</button>
-        </div>`;
-        elmTodo_All.insertAdjacentHTML('beforeend', html);
+        const html1 = createToDoItemHTML(
+            todo_items.length,
+            'all', //type
+            inputToDo.value
+        );
+        const html2 = createToDoItemHTML(
+            todo_items.length,
+            'actv', //type
+            inputToDo.value
+        );
+
+        // divTodoList.insertAdjacentHTML('beforeend', html);
+        divTodo_All.insertAdjacentHTML('beforeend', html1);
+        divTodo_Actv.insertAdjacentHTML('beforeend', html2);
 
         // Add navigation bar
-        elmNavBar.classList.remove('hidden');
+        divNavBar.classList.remove('hidden');
 
         // Show select all button
         btnSlctAll.classList.remove('hidden');
@@ -127,7 +143,7 @@ elmTodoInput.addEventListener('keyup', function(event) {
         updateNavigation(todo_items);
 
         // Empty input field
-        elmTodoInput.value = '';
+        inputToDo.value = '';
     }
     // console.log(todo_items);
 });
@@ -135,32 +151,82 @@ elmTodoInput.addEventListener('keyup', function(event) {
 // *Add event for checkbox using Event Delegation*
 // *Add event for delete button using Event Delegation*
 /// Step 1: Add event listener to the parent element of all the child elements we want to add event
-elmTodo_All.addEventListener('click', function(e) {
+divTodoList.addEventListener('click', function(e) {
     // '.todo__list' is the parent of '.todo__item'
 
     /// Step 2: If the e.target contains '.todo__checkbox' ie. if we click the checkbox
     if (e.target.classList.contains('todo__checkbox')) {
-        const id = Number(e.target.id.split('__')[1]),
-            item_id = `item__${id}`;
-        // console.log(`item_id = ${item_id}; id = ${id}`);
+        const id = Number(e.target.id.split('-')[1]);
+        console.log(`id = ${id}`);
+
+        // Clicked item in the todo_items list (to update status)
+        const currToDo = findItemById(todo_items, `item__${id}`);
+
+        // Clicked item in the divTodo_All list (to change CSS)
+        const currToDoAll = document.querySelector(`#item__all-${id}`);
+
+        // Clicked item in the divTodo_Actv list
+        const currToDoActv = document.querySelector(`#item__actv-${id}`);
+
+        // Clicked item in the divTodo_Cmpltd list
+        const currToDoCmpltd = document.querySelector(`#item__cmpltd-${id}`);
+
+        // HTML copy of the element
+        const currToDoActvHTML = createToDoItemHTML(
+                id,
+                'actv',
+                currToDo.content
+            ),
+            currToDoCmpltdHTML = createToDoItemHTML(
+                id,
+                'cmpltd',
+                currToDo.content
+            );
 
         if (e.target.checked) {
             // Update status to isDone = true
-            const currItem = findItemById(todo_items, id);
-            currItem.isDone = true;
+            currToDo.isDone = true;
 
-            const checkedItem = document.getElementById(`content__${id}`);
-            checkedItem.classList.add('done');
+            // Remove item in 'Active' page
+            divTodo_Actv.removeChild(currToDoActv);
+
+            // Add item to 'Completed' page
+            divTodo_Cmpltd.insertAdjacentHTML('beforeend', currToDoCmpltdHTML);
+
+            // Update item's content CSS in 'All' & 'Completed' page
+            divTodoList
+                .querySelector(`#content__all-${id}`)
+                .classList.add('done');
+            divTodoList
+                .querySelector(`#content__cmpltd-${id}`)
+                .classList.add('done');
+
+            console.log('currToDoAll', currToDoAll);
+            console.log('currToDoActv', currToDoActv);
 
             // Update number of undone items
             updateNavigation(todo_items);
         } else {
             // Update status to isDone = false
-            const currItem = findItemById(todo_items, id);
-            currItem.isDone = false;
+            currToDo.isDone = false;
 
-            document.getElementById(`content__${id}`).classList.remove('done');
-            console.log(document.getElementById(`content__${id}`));
+            // Add item in 'Active' page
+            divTodo_Actv.insertAdjacentHTML('beforeend', currToDoActvHTML);
+
+            // Remove item from 'Completed' page
+            divTodo_Cmpltd.querySelector(`#item__cmpltd-${id}`).remove();
+
+            // Update item's content CSS in 'All' & 'Completed' page
+            divTodoList
+                .querySelector(`#content__all-${id}`)
+                .classList.remove('done');
+            divTodoList
+                .querySelector(`#content__cmpltd-${id}`)
+                .classList.remove('done');
+
+            console.log('currToDoAll', currToDoAll);
+            console.log('currToDoActv', currToDoActv);
+            console.log('currToDoActvHTML', currToDoActvHTML);
 
             // Update number of undone items
             updateNavigation(todo_items);
@@ -169,16 +235,29 @@ elmTodo_All.addEventListener('click', function(e) {
 
     // Delete button
     if (e.target.classList.contains('todo__delete')) {
-        const id = Number(e.target.id.split('__')[1]),
+        const id = Number(e.target.id.split('-')[1]),
             item_id = `item__${id}`;
         // console.log(`item_id = ${item_id}; id = ${id}`);
 
+        // Clicked item in the todo_items list (to update status)
+        const currToDo = findItemById(todo_items, `item__${id}`);
+
+        // Clicked item in the divTodo_All list (to remove)
+        const currToDoAll = document.querySelector(`#item__all-${id}`);
+
+        // Clicked item in the divTodo_Actv list (to remove)
+        const currToDoActv = document.querySelector(`#item__actv-${id}`);
+
+        // Clicked item in the divTodo_Cmpltd list (to remove)
+        const currToDoCmpltd = document.querySelector(`#item__cmpltd-${id}`);
+
         // Update status to isDeleted = true
-        const currItem = findItemById(todo_items, id);
         currItem.isDeleted = true;
 
-        // Remove the item with id
-        document.getElementById(item_id).remove();
+        // Remove the item
+        currToDoAll.remove();
+        currToDoActv.remove();
+        currToDoCmpltd.remove();
 
         // Update number of undone items
         updateNavigation(todo_items);
@@ -188,11 +267,13 @@ elmTodo_All.addEventListener('click', function(e) {
 // *Add event for button to select all checkboxes*
 let isSelectedAll = false;
 btnSlctAll.addEventListener('click', function(e) {
+    //******** */
+    console.log('e:', e.target, e.currentTarget);
     if (!isSelectedAll) {
         todo_items.forEach(function(item, i) {
             const id = item.id;
 
-            // Add class 'done'
+            // Add class 'done' for all
             document.getElementById(`checkbox__${id}`).checked = true;
             document.getElementById(`content__${id}`).classList.add('done');
 
@@ -232,10 +313,13 @@ btnFltr_All.addEventListener('click', function(e) {
     btnFltr_All.classList.add('active');
 
     // Remove class 'hidden' from all items
-    console.log('all:', divFltr_All.children);
-    todo_items.forEach(function(item) {
-        item.classList.remove('hidden');
-    });
+    divTodo_All.classList.remove('none');
+    divTodo_Actv.classList.remove('none');
+    divTodo_Cmpltd.classList.remove('none');
+
+    // Add 'hidden' to divTodo_Actv and divTodo_Cmpltd
+    divTodo_Actv.classList.add('none');
+    divTodo_Cmpltd.classList.add('none');
 });
 
 // Show undone (active) items
@@ -249,16 +333,14 @@ btnFltr_Actv.addEventListener('click', function(e) {
 
     btnFltr_Actv.classList.add('active');
 
-    // Add class 'hidden' for done items
-    console.log('---todo_items', todo_items);
-    todo_items.forEach(function(item) {
-        console.log('item', item);
-        if (item.isDone === true) {
-            item.classList.add('hidden');
-        } else {
-            item.classList.remove('hidden');
-        }
-    });
+    // Remove class 'hidden' from all items
+    divTodo_All.classList.remove('none');
+    divTodo_Actv.classList.remove('none');
+    divTodo_Cmpltd.classList.remove('none');
+
+    // Add 'hidden' to divTodo_All and divTodo_Cmpltd
+    divTodo_All.classList.add('none');
+    divTodo_Cmpltd.classList.add('none');
 });
 
 // Show done items
@@ -272,12 +354,12 @@ btnFltr_Cmpltd.addEventListener('click', function(e) {
 
     btnFltr_Cmpltd.classList.add('active');
 
-    // Add class 'hidden' for undone items
-    todo_items.forEach(function(item) {
-        if (item.isDone === false) {
-            item.classList.add('hidden');
-        } else {
-            item.classList.remove('hidden');
-        }
-    });
+    // Remove class 'hidden' from all items
+    divTodo_All.classList.remove('none');
+    divTodo_Actv.classList.remove('none');
+    divTodo_Cmpltd.classList.remove('none');
+
+    // Add 'hidden' to divTodo_All and divTodo_Actv
+    divTodo_All.classList.add('none');
+    divTodo_Actv.classList.add('none');
 });

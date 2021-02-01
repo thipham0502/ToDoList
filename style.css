@@ -1,5 +1,6 @@
 /* MOVEMENTS */
 .todo__main {
+	position: relative;
 	display: table;
 	margin: 0 auto;
 	width: 500px;
@@ -30,8 +31,19 @@
 	align-items: flex-end;
 	justify-content: space-between;
 	border-color: cornflowerblue;
-	margin-top: 20px;
 }
+.todo__list {
+	margin-top: 50px;
+}
+/* .todo__list.todo__all {
+	background-color: rgb(216, 216, 216);
+}
+.todo__list.todo__active {
+	background-color: rgba(71, 197, 255, 0.829);
+}
+.todo__list.todo__completed {
+	background-color: rgba(116, 255, 97, 0.89);
+} */
 .todo__note {
 	margin-top: 50px;
 	margin-bottom: 20px;
@@ -48,6 +60,9 @@
 }
 .hidden {
 	visibility: hidden;
+}
+.none {
+	display: none;
 }
 .active {
 	border-color: cornflowerblue;
