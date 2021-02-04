@@ -200,6 +200,8 @@ divTodoList.addEventListener('click', function(e) {
             divTodoList
                 .querySelector(`#content__cmpltd-${id}`)
                 .classList.add('done');
+            divTodoList.querySelector(`#checkbox__all-${id}`).checked = true;
+            divTodoList.querySelector(`#checkbox__cmpltd-${id}`).checked = true;
 
             console.log('currToDoAll', currToDoAll);
             console.log('currToDoActv', currToDoActv);
@@ -261,6 +263,23 @@ divTodoList.addEventListener('click', function(e) {
 
         // Update number of undone items
         updateNavigation(todo_items);
+    }
+
+    // Double click item
+    if (e.target.classList.contains('todo__item')) {
+        const id = Number(e.target.id.split('-')[1]),
+            item_id = `item__${id}`;
+        document.querySelector(`#item__all-${id}`).ondblclick = function() {
+            alert('Double-clicked', e.target);
+        };
+
+        document.querySelector(`#item__actv-${id}`).ondblclick = function() {
+            alert('Double-clicked', e.target);
+        };
+
+        document.querySelector(`#item__cmpltd-${id}`).ondblclick = function() {
+            alert('Double-clicked', e.target);
+        };
     }
 });
 
