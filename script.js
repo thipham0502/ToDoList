@@ -17,8 +17,6 @@ const divTodo_All = document.querySelector('.todo__all');
 const divTodo_Actv = document.querySelector('.todo__active');
 const divTodo_Cmpltd = document.querySelector('.todo__completed');
 
-const btnTest = document.querySelector('#button__test');
-
 // Class for all todo items
 class ToDo {
     constructor(id, itemId, content, isDone, isDeleted) {
@@ -94,11 +92,6 @@ const createToDoItemHTML = function(id, type, content) {
             <input class="todo__edit none" type="text" id="textbox__${type}-${id}" autofocus>
             <!--</div>-->`;
 };
-
-btnTest.addEventListener('click', function() {
-    const obj = findItemById(todo_items, 'item__2');
-    console.log('test', obj);
-});
 
 // *Add new item to todo list*
 inputToDo.addEventListener('keyup', function(e) {
