@@ -83,11 +83,16 @@ const findItemById = function(itemList, itemId) {
 };
 
 const createToDoItemHTML = function(id, type, content) {
+    // Add the item and the input element (but hide it)
+
     return `<div class="todo__item" id="item__${type}-${id}">
                 <input class="todo__checkbox" type="checkbox" id="checkbox__${type}-${id}"/>
                 <div class="todo__content" id="content__${type}-${id}">${content}</div>
                 <button class="todo__delete" id="delete__${type}-${id}">X</button>
-            </div>`;
+            </div>
+            <!--<div class="todo__edit none" id="edit__${type}-${id}">-->
+            <input class="todo__edit none" type="text" id="textbox__${type}-${id}" autofocus>
+            <!--</div>-->`;
 };
 
 btnTest.addEventListener('click', function() {
@@ -96,11 +101,11 @@ btnTest.addEventListener('click', function() {
 });
 
 // *Add new item to todo list*
-inputToDo.addEventListener('keyup', function(event) {
+inputToDo.addEventListener('keyup', function(e) {
     // Number 13 is the "Enter" key on the keyboard
-    if (event.keyCode === 13) {
+    if (e.keyCode === 13) {
         // Cancel the default action, if needed
-        event.preventDefault();
+        e.preventDefault();
 
         // Create new todo instance
         const newToDo = new ToDo(
@@ -149,9 +154,8 @@ inputToDo.addEventListener('keyup', function(event) {
 });
 
 // *Add event for checkbox using Event Delegation*
-// *Add event for delete button using Event Delegation*
 /// Step 1: Add event listener to the parent element of all the child elements we want to add event
-divTodoList.addEventListener('click', function(e) {
+divTodoList.addEventListener('change', function(e) {
     // '.todo__list' is the parent of '.todo__item'
 
     /// Step 2: If the e.target contains '.todo__checkbox' ie. if we click the checkbox
@@ -188,10 +192,22 @@ divTodoList.addEventListener('click', function(e) {
             currToDo.isDone = true;
 
             // Remove item in 'Active' page
-            divTodo_Actv.removeChild(currToDoActv);
+            //divTodo_Actv.removeChild(currToDoActv);
+            divTodo_Actv
+                .querySelector(`#item__actv-${id}`)
+                .classList.add('none');
 
-            // Add item to 'Completed' page
-            divTodo_Cmpltd.insertAdjacentHTML('beforeend', currToDoCmpltdHTML);
+            // Add item to 'Completed' page if item not exists, else, just show it
+            if (!divTodo_Cmpltd.querySelector(`#item__actv-${id}`)) {
+                divTodo_Cmpltd.insertAdjacentHTML(
+                    'beforeend',
+                    currToDoCmpltdHTML
+                );
+            } else {
+                divTodo_Cmpltd
+                    .querySelector(`#item__actv-${id}`)
+                    .classList.remove('none');
+            }
 
             // Update item's content CSS in 'All' & 'Completed' page
             divTodoList
@@ -213,10 +229,18 @@ divTodoList.addEventListener('click', function(e) {
             currToDo.isDone = false;
 
             // Add item in 'Active' page
-            divTodo_Actv.insertAdjacentHTML('beforeend', currToDoActvHTML);
+            //divTodo_Actv.insertAdjacentHTML('beforeend', currToDoActvHTML);
+            divTodo_Actv
+                .querySelector(`#item__actv-${id}`)
+                .classList.remove('none');
+            // Uncheck checkbox
+            divTodo_All.querySelector(`#checkbox__all-${id}`).checked = false;
+            divTodo_Actv.querySelector(`#checkbox__actv-${id}`).checked = false;
 
             // Remove item from 'Completed' page
-            divTodo_Cmpltd.querySelector(`#item__cmpltd-${id}`).remove();
+            divTodo_Cmpltd
+                .querySelector(`#item__cmpltd-${id}`)
+                .classList.add('none');
 
             // Update item's content CSS in 'All' & 'Completed' page
             divTodoList
@@ -234,12 +258,15 @@ divTodoList.addEventListener('click', function(e) {
             updateNavigation(todo_items);
         }
     }
+});
 
+// *Add event for delete button using Event Delegation*
+divTodoList.addEventListener('click', function(e) {
     // Delete button
     if (e.target.classList.contains('todo__delete')) {
         const id = Number(e.target.id.split('-')[1]),
             item_id = `item__${id}`;
-        // console.log(`item_id = ${item_id}; id = ${id}`);
+        console.log(`-*-*-item_id = ${item_id}; id = ${id}-*-*-`);
 
         // Clicked item in the todo_items list (to update status)
         const currToDo = findItemById(todo_items, `item__${id}`);
@@ -254,64 +281,193 @@ divTodoList.addEventListener('click', function(e) {
         const currToDoCmpltd = document.querySelector(`#item__cmpltd-${id}`);
 
         // Update status to isDeleted = true
-        currItem.isDeleted = true;
+        currToDo.isDeleted = true;
 
         // Remove the item
-        currToDoAll.remove();
-        currToDoActv.remove();
-        currToDoCmpltd.remove();
+        if (currToDoAll) currToDoAll.classList.add('none');
+        if (currToDoActv) currToDoActv.classList.add('none');
+        if (currToDoCmpltd) currToDoCmpltd.classList.add('none');
 
         // Update number of undone items
         updateNavigation(todo_items);
     }
+});
 
-    // Double click item
-    if (e.target.classList.contains('todo__item')) {
+// *Add double click event for items using Event Delegation*
+divTodoList.addEventListener('dblclick', function(e) {
+    // Double click to edit item
+    if (e.target.classList.contains('todo__content')) {
         const id = Number(e.target.id.split('-')[1]),
             item_id = `item__${id}`;
-        document.querySelector(`#item__all-${id}`).ondblclick = function() {
-            alert('Double-clicked', e.target);
-        };
+        let currContent = '';
+        let type = '';
+        if (btnFltr_All.classList.contains('active')) type = 'all';
+        if (btnFltr_Actv.classList.contains('active')) type = 'actv';
+        if (btnFltr_Cmpltd.classList.contains('active')) type = 'cmpltd';
 
-        document.querySelector(`#item__actv-${id}`).ondblclick = function() {
-            alert('Double-clicked', e.target);
-        };
+        // Get current content
+        const currItem = divTodo_All.querySelector(`#item__${type}-${id}`);
+        const currTextBox = divTodo_All.querySelector(
+            `#textbox__${type}-${id}`
+        );
 
-        document.querySelector(`#item__cmpltd-${id}`).ondblclick = function() {
-            alert('Double-clicked', e.target);
-        };
+        currContent = divTodo_All.querySelector(`#content__${type}-${id}`)
+            .textContent;
+        console.log('currContent', currContent);
+        // Hide item, show edit
+        currItem.classList.add('none');
+        currTextBox.classList.remove('none');
+        currTextBox.value = currContent;
+        currTextBox.focus();
+    }
+});
+
+// *Add keypress event to edit items using Event Delegation*
+divTodoList.addEventListener('keyup', function(e) {
+    // Press Enter to change item's content
+    // Number 13 is the "Enter" key on the keyboard
+    if (e.target.classList.contains('todo__edit') && e.keyCode === 13) {
+        // Cancel the default action, if needed
+        e.preventDefault();
+        const id = Number(e.target.id.split('-')[1]),
+            item_id = `item__${id}`;
+        let type = '';
+        if (btnFltr_All.classList.contains('active')) type = 'all';
+        if (btnFltr_Actv.classList.contains('active')) type = 'actv';
+        if (btnFltr_Cmpltd.classList.contains('active')) type = 'cmpltd';
+
+        // Get current item
+        const currToDo = findItemById(todo_items, `item__${id}`);
+        const currItem = divTodoList.querySelector(`#item__${type}-${id}`);
+        const currTextBox = divTodoList.querySelector(
+            `#textbox__${type}-${id}`
+        );
+
+        // Get new content value
+        const newContent = divTodoList.querySelector(`#textbox__${type}-${id}`)
+            .value;
+        console.log('newContent', newContent);
+
+        // Update new content
+        const currContent = divTodoList.querySelector(
+            `#content__${type}-${id}`
+        );
+        currContent.textContent = newContent;
+        currToDo.content = newContent;
+
+        // Update content on other page
+        const allContent = divTodoList.querySelector(`#content__all-${id}`),
+            actvContent = divTodoList.querySelector(`#content__actv-${id}`),
+            cmpltdContent = divTodoList.querySelector(`#content__cmpltd-${id}`);
+        switch (type) {
+            case 'all':
+                if (actvContent) actvContent.textContent = newContent;
+                if (cmpltdContent) cmpltdContent.textContent = newContent;
+
+            case 'actv':
+                if (allContent) allContent.textContent = newContent;
+                if (cmpltdContent) cmpltdContent.textContent = newContent;
+
+            case 'cmpltd':
+                if (allContent) allContent.textContent = newContent;
+                if (actvContent) actvContent.textContent = newContent;
+        }
+
+        // Hide edit, show item
+        currItem.classList.remove('none');
+        currTextBox.classList.add('none');
     }
 });
 
 // *Add event for button to select all checkboxes*
 let isSelectedAll = false;
 btnSlctAll.addEventListener('click', function(e) {
-    //******** */
     console.log('e:', e.target, e.currentTarget);
+    console.log('isSelectedAll', isSelectedAll);
+
+    const done_items = todo_items.filter(item => !item.isDone),
+        undone_items = todo_items.filter(item => item.isDone);
+    console.log('done_items', done_items);
+    console.log('undone_items', undone_items);
+
     if (!isSelectedAll) {
-        todo_items.forEach(function(item, i) {
+        done_items.forEach(function(item, i) {
             const id = item.id;
+            console.log(`#checkbox__actv-${id}`);
 
             // Add class 'done' for all
-            document.getElementById(`checkbox__${id}`).checked = true;
-            document.getElementById(`content__${id}`).classList.add('done');
+            divTodo_All.querySelector(`#checkbox__all-${id}`).checked = true;
+            divTodo_All
+                .querySelector(`#content__all-${id}`)
+                .classList.add('done');
+            divTodo_Actv.querySelector(`#checkbox__actv-${id}`).checked = true;
+            divTodo_Actv
+                .querySelector(`#content__actv-${id}`)
+                .classList.add('done');
+
+            // Remove from "Active" tab
+            divTodo_Actv
+                .querySelector(`#item__actv-${id}`)
+                .classList.add('none');
+
+            // Add item to 'Completed' page if item not exists, else, just show it
+            const currToDo = findItemById(todo_items, `item__${id}`);
+            const currToDoCmpltdHTML = createToDoItemHTML(
+                id,
+                'cmpltd',
+                currToDo.content
+            );
+            if (!divTodo_Cmpltd.querySelector(`#item__cmpltd-${id}`)) {
+                divTodo_Cmpltd.insertAdjacentHTML(
+                    'beforeend',
+                    currToDoCmpltdHTML
+                );
+                divTodo_Cmpltd
+                    .querySelector(`#content__cmpltd-${id}`)
+                    .classList.add('done');
+                divTodo_Cmpltd.querySelector(
+                    `#checkbox__cmpltd-${id}`
+                ).checked = true;
+            } else {
+                divTodo_Cmpltd
+                    .querySelector(`#item__cmpltd-${id}`)
+                    .classList.remove('none');
+            }
 
             // Update item's isDone
             item.isDone = true;
         });
-        isSelectedAll = !isSelectedAll;
     } else {
-        todo_items.forEach(function(item, i) {
+        undone_items.forEach(function(item, i) {
             const id = item.id;
 
             // Remove class 'done'
-            document.getElementById(`checkbox__${id}`).checked = false;
-            document.getElementById(`content__${id}`).classList.remove('done');
+            divTodo_All.querySelector(`#checkbox__all-${id}`).checked = false;
+            divTodo_All
+                .querySelector(`#content__all-${id}`)
+                .classList.remove('done');
+
+            // Remove from "Completed" page
+            divTodo_Cmpltd
+                .querySelector(`#item__cmpltd-${id}`)
+                .classList.add('none');
+
+            // Add to "Active" page
+            divTodo_Actv
+                .querySelector(`#item__actv-${id}`)
+                .classList.remove('none');
+            divTodo_Actv
+                .querySelector(`#content__actv-${id}`)
+                .classList.remove('done');
+            divTodo_Actv.querySelector(`#checkbox__actv-${id}`).checked = false;
 
             // Update item's isDone
             item.isDone = false;
         });
     }
+
+    // Update state
+    isSelectedAll = !isSelectedAll;
 
     // Update number of undone items
     updateNavigation(todo_items);
