@@ -83,9 +83,11 @@ h1 {
 	font-size: 20px;
 }
 .todo__checkbox {
-	height: 20px;
-	width: 20px;
+	margin-left: 10px;
+	margin-right: 10px;
 	padding: 0;
+	height: 22px;
+	width: 22px;
 }
 .todo__delete {
 	margin-left: 10px;
