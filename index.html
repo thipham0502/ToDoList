@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css" />
-    <title>Document</title>
+    <title>Todo List</title>
 </head>
 
 <body>
@@ -13,8 +13,8 @@
     <div class="todo__main">
         <div class="todo__add">
             <div class="todo__add todo__select_all hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                    class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                    class="bi bi-caret-down-fill" viewBox="0 0 18 18">
                     <path
                         d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
                 </svg>
@@ -34,11 +34,12 @@
         <div class="todo__nav hidden" id="nav__bar">
             <div class="todo__nav todo__item_left" id="item__left">1 item left</div>
             <button class="todo__nav todo__filter_all active">All</button>
-            <button class="todo__nav todo__filter_active">Active</button>
-            <button class="todo__nav todo__filter_completed">Completed</button>
-            <button class="todo__nav todo__clear_completed">Clear completed</button>
+            <button class="todo__nav todo__filter_actv">Active</button>
+            <button class="todo__nav todo__filter_cmpltd">Completed</button>
+            <button class="todo__nav todo__clear_cmpltd">Clear completed</button>
         </div>
-        <div class="todo__note">Double-click to edit a todo</div>
+        <p class="todo__note">Double-click to edit a todo</p>
+        <p class="todo__note">Created by Kathy Pham</p>
     </div>
 
     <script src="script.js"></script>

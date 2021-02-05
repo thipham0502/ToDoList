@@ -8,8 +8,8 @@ const divItemLeft = document.getElementById('item__left');
 
 // *Filter buttons*
 const btnFltr_All = document.querySelector('.todo__filter_all');
-const btnFltr_Actv = document.querySelector('.todo__filter_active');
-const btnFltr_Cmpltd = document.querySelector('.todo__filter_completed');
+const btnFltr_Actv = document.querySelector('.todo__filter_actv');
+const btnFltr_Cmpltd = document.querySelector('.todo__filter_cmpltd');
 const btnClearCmpltd = document.querySelector('.todo__clear_completed');
 
 // *Filter areas*
@@ -531,3 +531,5 @@ btnFltr_Cmpltd.addEventListener('click', function(e) {
     divTodo_All.classList.add('none');
     divTodo_Actv.classList.add('none');
 });
+
+/* *************** CLEAR COMPLETED *************** */
