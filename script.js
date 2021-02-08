@@ -10,7 +10,7 @@ const divItemLeft = document.getElementById('item__left');
 const btnFltr_All = document.querySelector('.todo__filter_all');
 const btnFltr_Actv = document.querySelector('.todo__filter_actv');
 const btnFltr_Cmpltd = document.querySelector('.todo__filter_cmpltd');
-const btnClearCmpltd = document.querySelector('.todo__clear_completed');
+const btnClearCmpltd = document.querySelector('.todo__clear_cmpltd');
 
 // *Filter areas*
 const divTodo_All = document.querySelector('.todo__all');
@@ -533,3 +533,32 @@ btnFltr_Cmpltd.addEventListener('click', function(e) {
 });
 
 /* *************** CLEAR COMPLETED *************** */
+btnClearCmpltd.addEventListener('click', function(e) {
+    console.log('Clicked', e.target);
+    const done_items = todo_items.filter(
+        item => item.isDone && !item.isDeleted
+    );
+
+    done_items.forEach(function(item, i) {
+        const id = item.id;
+        // Clicked item in the todo_items list (to update status)
+        const currToDo = findItemById(todo_items, `item__${id}`);
+
+        // Clicked item in the divTodo_All list (to remove)
+        const currToDoAll = document.querySelector(`#item__all-${id}`);
+
+        // Clicked item in the divTodo_Actv list (to remove)
+        const currToDoActv = document.querySelector(`#item__actv-${id}`);
+
+        // Clicked item in the divTodo_Cmpltd list (to remove)
+        const currToDoCmpltd = document.querySelector(`#item__cmpltd-${id}`);
+
+        // Update status to isDeleted = true
+        currToDo.isDeleted = true;
+
+        // Remove the item
+        if (currToDoAll) currToDoAll.classList.add('none');
+        if (currToDoActv) currToDoActv.classList.add('none');
+        if (currToDoCmpltd) currToDoCmpltd.classList.add('none');
+    });
+});
